@@ -5,21 +5,21 @@ import { useEffect, useState } from 'react'
 
 export default function Home() {
   const [codeVerifier, setCodeVerifier] = useState('')
-  const [accessInfo, setAccessInfo] = useState('')
+  const [token, setToken] = useState('')
 
   const handleLogin = async () => {
     await oauth_login()
     setCodeVerifier(sessionStorage.getItem('code_verifier'))
   }
 
-  const handleAccessInfo = async () => {
+  const handleGetToken = async () => {
     await redeem_auth_code(document.location.search)
-    setAccessInfo(sessionStorage.getItem('access_info'))
+    setToken(sessionStorage.getItem('token'))
   }
 
   useEffect(() => {
     setCodeVerifier(sessionStorage.getItem('code_verifier'))
-    setAccessInfo(sessionStorage.getItem('access_info'))
+    setToken(sessionStorage.getItem('token'))
   }, [])
 
   return (
@@ -31,11 +31,11 @@ export default function Home() {
       <div>
         code verifier: {codeVerifier}
       </div>
-      <Button onClick={handleAccessInfo}>
-        Token
+      <Button onClick={handleGetToken}>
+        Get Access Token
       </Button>
       <div>
-        token: {accessInfo}
+        token: {token}
       </div>
     </>
   )

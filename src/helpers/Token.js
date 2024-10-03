@@ -43,5 +43,5 @@ export async function redeem_auth_code(response_str) {
   const expires_at = new Date(Date.now() + (info.expires_in * 1000))
   info.expires_at = expires_at
   console.log(`Access token expires at ${expires_at.toLocaleTimeString()} local time.`)
-  sessionStorage.setItem('access_info', JSON.stringify(info))
+  sessionStorage.setItem('token', JSON.stringify(info))
 }

@@ -7,12 +7,6 @@ import {
 } from '@looker/sdk-rtl'
 
 class SDKSession extends AuthSession {
-  // This is a placeholder for the fetchToken function.
-  // It is modified to make it useful later.
-  async fetchToken() {
-    return fetch('')
-  }
-
   activeToken = new AuthToken()
   constructor(settings, transport) {
     super(settings, transport || new BrowserTransport(settings))
@@ -28,9 +22,10 @@ class SDKSession extends AuthSession {
   // This function gets the current token or fetches a new one if necessary
   async getToken() {
     if (!this.isAuthenticated()) {
-      const token = await this.fetchToken()
-      const res = await token.json()
-      this.activeToken.setToken(res.user_token)
+      const token = sessionStorage.getItem('token')
+      if (token) {
+        this.activeToken.setToken(JSON.parse(token))
+      }
     }
     return this.activeToken
   }
@@ -51,15 +46,8 @@ class SDKSession extends AuthSession {
   }
 }
 
-// This class sets the fetchToken to use the 'real' address of the backend server.
-class SDKSessionEmbed extends SDKSession {
-  async fetchToken() {
-    return fetch(`${process.env.REACT_APP_BACKEND_SERVER}/callasuser2`)
-  }
-}
-
 // This creates a new session with the 'real' address used above
-const session = new SDKSessionEmbed({
+const session = new SDKSession({
   ...DefaultSettings,
   base_url: process.env.REACT_APP_LOOKER_API_HOST,
 })

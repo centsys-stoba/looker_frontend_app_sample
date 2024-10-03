@@ -1,5 +1,3 @@
-import { sdk } from '../src/helpers/CorsSession'
-import { DataProvider } from '@looker/components-data'
 import { ComponentsProvider } from '@looker/components'
 import {
   createBrowserRouter,
@@ -35,10 +33,8 @@ function App() {
   return (
     <>
       <ComponentsProvider>
-        <DataProvider sdk={sdk}>
-          <RouterProvider router={router} >
-          </RouterProvider>
-        </DataProvider>
+        <RouterProvider router={router} >
+        </RouterProvider>
       </ComponentsProvider>
     </>
   )
