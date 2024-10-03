@@ -1,51 +1,43 @@
 import { sdk } from '../src/helpers/CorsSession'
-import { Query, Visualization } from '@looker/visualizations'
 import { DataProvider } from '@looker/components-data'
-import { Button, ComponentsProvider } from '@looker/components'
-import { oauth_login } from './helpers/Auth'
-import { redeem_auth_code } from './helpers/Token'
-import { useEffect, useState } from 'react'
+import { ComponentsProvider } from '@looker/components'
+import {
+  createBrowserRouter,
+  Outlet,
+  RouterProvider,
+} from 'react-router-dom'
+import Home from './pages/Home'
+import Query from './pages/Query'
+import Navigation from './components/Navigation'
 
-function App() {
-  const [codeVerifier, setCodeVerifier] = useState('')
-  const [accessInfo, setAccessInfo] = useState('')
+const router = createBrowserRouter([
+  {
+    path: "/",
+    Component: Root,
+    children: [
+      { index: true, Component: Home },
+      { path: '/authenticated', Component: Home },
+      { path: '/query', Component: Query },
+    ]
+  },
+]);
 
-  const handleLogin = async () => {
-    await oauth_login()
-    setCodeVerifier(sessionStorage.getItem('code_verifier'))
-  }
-
-  const handleAccessInfo = async () => {
-    await redeem_auth_code(document.location.search)
-    setAccessInfo(sessionStorage.getItem('access_info'))
-  }
-
-  useEffect(() => {
-    setCodeVerifier(sessionStorage.getItem('code_verifier'))
-    setAccessInfo(sessionStorage.getItem('access_info'))
-  }, [])
-
+function Root() {
   return (
     <>
-      <h1>Get started with Looker visualization components</h1>
+      <Navigation />
+      <Outlet />
+    </>
+  )
+}
+
+function App() {
+  return (
+    <>
       <ComponentsProvider>
-        <Button onClick={handleLogin}>
-          Login
-        </Button>
-        <div>
-          code verifier: {codeVerifier}
-        </div>
-        <Button onClick={handleAccessInfo}>
-          Token
-        </Button>
-        <div>
-          token: {accessInfo}
-        </div>
         <DataProvider sdk={sdk}>
-          {/* Change this query slug to match your query slug */}
-          <Query query="GyUTPxDEVLIzTFhS7QPMXY">
-            <Visualization />
-          </Query>
+          <RouterProvider router={router} >
+          </RouterProvider>
         </DataProvider>
       </ComponentsProvider>
     </>
