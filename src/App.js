@@ -1,12 +1,13 @@
-import { ComponentsProvider } from '@looker/components'
+import { ComponentsProvider, Box, Space } from '@looker/components'
 import {
   createBrowserRouter,
   Outlet,
   RouterProvider,
 } from 'react-router-dom'
 import Home from './pages/Home'
-import Query from './pages/Query'
+import QueryPage from './pages/Query'
 import Navigation from './components/Navigation'
+import EmbedPage from './pages/Embed'
 
 const router = createBrowserRouter([
   {
@@ -15,7 +16,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, Component: Home },
       { path: '/authenticated', Component: Home },
-      { path: '/query', Component: Query },
+      { path: '/query', Component: QueryPage },
+      { path: '/embed', Component: EmbedPage },
     ]
   },
 ]);
@@ -23,8 +25,14 @@ const router = createBrowserRouter([
 function Root() {
   return (
     <>
-      <Navigation />
-      <Outlet />
+      <Space around align="start">
+        <Box width="100px">
+          <Navigation />
+        </Box>
+        <Box>
+          <Outlet />
+        </Box>
+      </Space>
     </>
   )
 }

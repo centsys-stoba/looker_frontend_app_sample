@@ -10,6 +10,9 @@ export default function Navigation() {
       <ListItem>
         <Link to={"/query"}>Query</Link>
       </ListItem>
+      <ListItem>
+        <Link to={"/embed"}>Embed</Link>
+      </ListItem>
     </List>
   )
 }

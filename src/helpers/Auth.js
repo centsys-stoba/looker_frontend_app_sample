@@ -24,6 +24,13 @@ export async function oauth_login() {
   document.location = url
 }
 
+export async function oauth_logout(sdk) {
+  await sdk.logout()
+    .then(() => {
+      sessionStorage.removeItem('code_verifier')
+    })
+}
+
 function array_to_hex(array) {
   return Array.from(array).map(b => b.toString(16).padStart(2,'0')).join('')
 }
