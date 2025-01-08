@@ -1,16 +1,18 @@
 import { sdk } from '../helpers/Session'
 import { DataProvider } from '@looker/components-data'
 import { Query, Visualization } from '@looker/visualizations'
-import { Button, Label, InputText } from '@looker/components'
+import { Button, Space, SpaceVertical, Form, FieldText } from '@looker/components'
 import { useState } from 'react'
 
 export default function QueryPage() {
-  const [slug, setSlug] = useState('')
+  const [query, setQuery] = useState(null)
   const [form, setForm] = useState({
     model: 'okayama_info',
     view: 'population',
     fields: 'population.city_name,population.total_population',
   })
+  const [operationType, setOperationType] = useState('')
+  const [queryResult, setQueryResult] = useState(null)
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -27,37 +29,66 @@ export default function QueryPage() {
       fields: form.fields.split(',').map(item => item.trim()),
       limit: 100
     }).then(res => {
-      setSlug(res.value.slug)
+      setQuery(res.value)
+    })
+  }
+
+  const handleVisualize = async () => {
+    setOperationType('visualize')
+  }
+
+  const handleShowJson = async () => {
+    sdk.run_query({ query_id: query.id, result_format: 'json_bi' })
+      .then(res => {
+        setQueryResult(res)
+        setOperationType('showJson')
     })
   }
 
   return (
     <>
-      <div>
-        <Label>Model</Label>
-        <InputText name='model' type='text' value={form.model} onChange={handleFormChange} />
-        <Label>View</Label>
-        <InputText name='view' type='text' value={form.view} onChange={handleFormChange} />
-        <Label>Fields</Label>
-        <InputText name='fields' type='text' value={form.fields} onChange={handleFormChange} />
+      <SpaceVertical minWidth="600px">
+        <p>Login and get access token before creating a query.</p>
+        <Form>
+          <FieldText label='model' name='model' type='text' value={form.model} onChange={handleFormChange} />
+          <FieldText label='view' name='view' type='text' value={form.view} onChange={handleFormChange} />
+          <FieldText label='fields' name='fields' type='text' value={form.fields} onChange={handleFormChange} />
+        </Form>
         <Button onClick={handleCreateQuery}>
           Create Query
         </Button>
-      </div>
-      {slug ?
-        <>
-          <div>
-            Query slug: {slug}
-          </div>
+        {query && query.slug ?
+          <>
+            <div>
+              Query slug: {query.slug}
+            </div>
+            <Space>
+              <Button onClick={handleVisualize}>
+                Visualize
+              </Button>
+              <Button onClick={handleShowJson}>
+                Show json
+              </Button>
+            </Space>
+          </>
+          :
+          <div>no query created</div>
+        }
+        {operationType === 'visualize' ?
           <DataProvider sdk={sdk}>
-            <Query query={slug}>
+            <Query query={query.slug}>
               <Visualization />
             </Query>
           </DataProvider>
-        </>
-        :
-        <div>no slug</div>
-      }
+          : null
+        }
+        {operationType === 'showJson' ?
+          <pre>
+            {JSON.stringify(queryResult, null, 2)}
+          </pre>
+          : null
+        }
+      </SpaceVertical>
     </>
   )
 }

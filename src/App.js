@@ -25,7 +25,7 @@ const router = createBrowserRouter([
 function Root() {
   return (
     <>
-      <Space around align="start">
+      <Space align="start">
         <Box width="100px">
           <Navigation />
         </Box>

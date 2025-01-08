@@ -1,4 +1,4 @@
-import { Button } from '@looker/components'
+import { Button, Space, SpaceVertical } from '@looker/components'
 import { oauth_login, oauth_logout } from '../helpers/Auth'
 import { redeem_auth_code } from '../helpers/Token'
 import { useEffect, useState } from 'react'
@@ -36,21 +36,23 @@ export default function Home() {
   return (
     <>
       <h1>Get started with Looker visualization components</h1>
-      <div>
-        <Button onClick={handleLogin}>
-          Login
-        </Button>
-        <Button onClick={handleLogout}>
-          Logout
-        </Button>
-        <span>code verifier: {codeVerifier}</span>
-      </div>
-      <div>
-        <Button onClick={handleGetToken}>
-          Get Access Token
-        </Button>
-        <span>token: {token}</span>
-      </div>
+      <SpaceVertical>
+        <Space>
+          <Button onClick={handleLogin}>
+            Login
+          </Button>
+          <Button onClick={handleLogout}>
+            Logout
+          </Button>
+          <span>code verifier: {codeVerifier}</span>
+        </Space>
+        <Space>
+          <Button onClick={handleGetToken}>
+            Get Access Token
+          </Button>
+          <span>token: {token}</span>
+        </Space>
+      </SpaceVertical>
     </>
   )
 }
