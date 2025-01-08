@@ -1,3 +1,10 @@
+Lookerのフロントエンドアプリのサンプルです
+
+- `npm start`する前に`.env.local`を作成して中の環境変数を変更してください
+- Lookerの機能動作のためにLookerのSSOによる認証をしてます、APIキーによる認証じゃありません
+- クエリの実行とiframe埋め込みの例を例を実装してます
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
