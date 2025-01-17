@@ -1,15 +1,18 @@
 import { sdk } from '../helpers/Session'
 import { DataProvider } from '@looker/components-data'
 import { Query, Visualization } from '@looker/visualizations'
-import { Button, Space, SpaceVertical, Form, FieldText } from '@looker/components'
+import { Button, Space, SpaceVertical, Form, FieldText, FieldSelect } from '@looker/components'
 import { useState } from 'react'
 
 export default function QueryPage() {
   const [query, setQuery] = useState(null)
   const [form, setForm] = useState({
-    model: 'okayama_info',
-    view: 'population',
-    fields: 'population.city_name,population.total_population',
+    model: 'e_commerce',
+    view: 'orders',
+    fields: 'orders.created_date,orders.count',
+  })
+  const [visualizeConfig, setVisualizeConfig] = useState({
+    type: 'line'
   })
   const [operationType, setOperationType] = useState('')
   const [queryResult, setQueryResult] = useState(null)
@@ -22,15 +25,29 @@ export default function QueryPage() {
     }))
   }
 
+  const handleVisualizeConfigChange = (v) => {
+    setVisualizeConfig({ type: v })
+  }
+
   const handleCreateQuery = async () => {
     await sdk.create_query({
       model: form.model,
       view: form.view,
       fields: form.fields.split(',').map(item => item.trim()),
-      limit: 100
+      limit: 100,
+      vis_config: { 
+        type: visualizeConfig.type,
+      }
     }).then(res => {
       setQuery(res.value)
     })
+  }
+
+  const runQuery = () => {
+    sdk.run_query({ query_id: query.id, result_format: 'json_detail' })
+      .then(res => {
+        setQueryResult(res)
+      })
   }
 
   const handleVisualize = async () => {
@@ -38,11 +55,8 @@ export default function QueryPage() {
   }
 
   const handleShowJson = async () => {
-    sdk.run_query({ query_id: query.id, result_format: 'json_bi' })
-      .then(res => {
-        setQueryResult(res)
-        setOperationType('showJson')
-    })
+    await runQuery()
+    setOperationType('showJson')
   }
 
   return (
@@ -53,6 +67,19 @@ export default function QueryPage() {
           <FieldText label='model' name='model' type='text' value={form.model} onChange={handleFormChange} />
           <FieldText label='view' name='view' type='text' value={form.view} onChange={handleFormChange} />
           <FieldText label='fields' name='fields' type='text' value={form.fields} onChange={handleFormChange} />
+          <FieldSelect label='visualizeType' name='type' value={visualizeConfig.type} onChange={handleVisualizeConfigChange} 
+            options={[
+              { label: 'area', value: 'area' },
+              { label: 'bar', value: 'bar' },
+              { label: 'column', value: 'column' },
+              { label: 'line', value: 'line' },
+              { label: 'scatter', value: 'scatter' },
+              { label: 'single_value', value: 'single_value' },
+              { label: 'sparkline', value: 'sparkline' },
+              { label: 'table', value: 'table' },
+              { label: 'pie', value: 'pie' },
+            ]}
+          />
         </Form>
         <Button onClick={handleCreateQuery}>
           Create Query
@@ -75,11 +102,13 @@ export default function QueryPage() {
           <div>no query created</div>
         }
         {operationType === 'visualize' ?
-          <DataProvider sdk={sdk}>
-            <Query query={query.slug}>
-              <Visualization />
-            </Query>
-          </DataProvider>
+          <>
+            <DataProvider sdk={sdk}>
+              <Query query={query.slug} >
+                <Visualization height={600} width={800} />
+              </Query>
+            </DataProvider>
+          </>
           : null
         }
         {operationType === 'showJson' ?
